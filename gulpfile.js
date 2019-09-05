@@ -89,13 +89,13 @@ exports.createBrowserSync = createBrowserSync;
 //createBrowserSync
 
 //createPuppeteer
-async function _createPuppeteer(){
-
+async function _connectLocalPuppeteer(){
     const debuggerUrl = await getWebSockDebuggerUrl();
     const browser = await puppeteer.connect({browserWSEndpoint : debuggerUrl});
+    return browser;
 }
-const createPuppeteer = _createPuppeteer;
-exports.createPuppeteer = createPuppeteer;
+const connectLocalPuppeteer = _connectLocalPuppeteer;
+exports.connectLocalPuppeteer = connectLocalPuppeteer;
 //createPuppeteer
 
 
@@ -111,7 +111,7 @@ exports.getWebSockDebuggerUrl = getWebSockDebuggerUrl;
 
 gulp.task("live-edit",async ()=>{
     await createBrowserSync();
-    await createPuppeteer();
+    await connectLocalPuppeteer();
 })
 
 gulp.task("default",gulp.series("puppeteer","live-edit","sass","js_src","serve"))

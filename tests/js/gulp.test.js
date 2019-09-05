@@ -1,4 +1,4 @@
-const {getWebSockDebuggerUrl, initializePuppeteer, connectLocalPuppeteer, createIncognitoContext} = require("../../gulpfile")
+const {getWebSockDebuggerUrl, initializePuppeteer, connectLocalPuppeteer, createIncognitoContext, createPage} = require("../../gulpfile")
 const _puppeteer = require("puppeteer")
 
 test("Test WebSocket Debugger Url", async () => {
@@ -34,3 +34,22 @@ test("Create IncognitoContext with Device Size at Url returns the Page", async (
 
     await _instance.close();
 },10000)
+
+test('Tests creation of Page takes url and device type returns the Page', async () => {
+    const _instance = await initializePuppeteer();
+    const page = await createPage("https://google.com");
+
+    expect(page).toBeDefined();
+    await page.close();
+
+    const devicePage = await createPage("https://google.com","iPhone 8")
+    expect(devicePage).toBeDefined();
+    await devicePage.close();
+
+    const undefinedUrlAndDevice = await createPage();
+    expect(undefinedUrlAndDevice).toBeDefined();
+
+    await undefinedUrlAndDevice.close();
+
+    await _instance.close();
+},20000)

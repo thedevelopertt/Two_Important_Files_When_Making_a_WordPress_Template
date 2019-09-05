@@ -116,6 +116,23 @@ const createIncognitoContext = _createIncognitoContext;
 exports.createIncognitoContext = createIncognitoContext;
 //createIncognitoContext
 
+//createPage
+async function _createPage(url,device){
+    const browser = await connectLocalPuppeteer();
+    const page = await browser.newPage()
+
+    if(device)
+        await page.emulate(puppeteer.devices[device]);
+
+    if(url)
+        await page.goto(url);
+
+    return page;
+}
+const createPage = _createPage;
+exports.createPage = createPage;
+//createPage
+
 //getWebSockDebuggerUrl
 async function _getWebSockDebuggerUrl(){
     const response = await axios.get('http://localhost:9090/json/version')

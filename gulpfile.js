@@ -153,9 +153,9 @@ gulp.task("live-edit",async ()=>{
 
     const _browserSyncUrl = "https://localhost:3000";
     let browserSyncUrl = _browserSyncUrl;
-    const iphone = await createPage(browserSyncUrl,"iPhone 8");
-//     await createPage(browserSyncUrl,"iPad");
-//     await createPage(browserSyncUrl);
+    const iphone = await createPage(browserSyncUrl,"Galaxy S5");
+    await createPage(browserSyncUrl,"iPad");
+    await createPage(browserSyncUrl);
 })
 
 gulp.task("default",gulp.series("puppeteer","live-edit","sass","js_src","serve"))

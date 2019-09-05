@@ -7,8 +7,8 @@ const concat = require("gulp-concat")
 const autoprefixer = require('gulp-autoprefixer');
 const sourcemaps = require('gulp-sourcemaps');
 const plumber = require("gulp-plumber")
-const browsersync = require("browser-sync")
-// const puppeteer = require("puppeteer")
+const browsersync = require("browser-sync").create()
+const puppeteer = require("puppeteer")
 const phpunit = require("gulp-phpunit")
 
 
@@ -25,6 +25,7 @@ gulp.task("sass",()=>{
         .pipe(rename("style.css"))
         .pipe(clean_css())
         .pipe(gulp.dest("./dist/css"))
+        .pipe(browsersync.stream())
 })
 
 //This task concatenates all Javascript source file not including the libraries used to the dist/js directory
@@ -33,16 +34,20 @@ gulp.task('js_src', () => {
         .pipe(concat('main.js'))
         .pipe(uglify())
         .pipe(gulp.dest("./dist/js"))
+        .pipe(browsersync.stream())
 })
 
 //This task is called with the gulp keyword
 gulp.task('serve',()=>{
+
     gulp.watch("src/sass/*.scss",gulp.parallel("sass"))
     gulp.watch("src/js/*.js",gulp.parallel("js_src"))
+
+    gulp.watch("./*.php").on('change', browsersync.reload);
+    gulp.watch("./src/*.php").on('change', browsersync.reload);
 })
 
 //This task runs PHP tests
-
 gulp.task('phpunit', async function() {
     const options = {debug: false};
     await gulp.src('./phpunit.xml')
@@ -51,4 +56,25 @@ gulp.task('phpunit', async function() {
         }));
 });
 
-gulp.task("default",gulp.parallel("serve","sass","js_src"))
+//Launches new Puppeteer Browser
+gulp.task('puppeteer', async () => {
+    // await puppeteer.launch({
+    //     headless : false
+    // })
+})
+
+//createBrowserSync
+function _createBrowserSync(){
+    browsersync.init({
+        proxy : "https://thedevelopertt.ml"
+    });
+}
+const createBrowserSync = _createBrowserSync;
+exports.createBrowserSync = createBrowserSync;
+//createBrowserSync
+
+gulp.task("live-edit",()=>{
+    createBrowserSync();
+})
+
+gulp.task("default",gulp.parallel("live-edit","sass","js_src","serve","puppeteer"))

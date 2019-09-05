@@ -98,6 +98,23 @@ const connectLocalPuppeteer = _connectLocalPuppeteer;
 exports.connectLocalPuppeteer = connectLocalPuppeteer;
 //createPuppeteer
 
+//createIncognitoContext
+async function _createIncognitoContext(url, device){
+    const browser = await connectLocalPuppeteer();
+    const context = await browser.createIncognitoBrowserContext();
+    const page = await context.newPage();
+
+    if(device)
+        await page.emulate(puppeteer.devices[device]);
+
+    if(url)
+        await page.goto(url);
+
+    return page;
+}
+const createIncognitoContext = _createIncognitoContext;
+exports.createIncognitoContext = createIncognitoContext;
+//createIncognitoContext
 
 //getWebSockDebuggerUrl
 async function _getWebSockDebuggerUrl(){

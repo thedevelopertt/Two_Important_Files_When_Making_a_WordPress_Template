@@ -12,6 +12,8 @@ const puppeteer = require("puppeteer")
 const phpunit = require("gulp-phpunit")
 const axios = require("axios")
 
+const {Page,Browser} = puppeteer;
+
 
 // This task compiles SASS to css with autoprefixer enabled, generates sourcemaps and minifies to the dist/css directory
 gulp.task("sass",()=>{
@@ -66,6 +68,8 @@ gulp.task('puppeteer', async () => {
 async function _initializePuppeteer(){
     const _puppeteer = await puppeteer.launch({
         headless : false,
+        slowMo : 200,
+        ignoreHTTPSErrors: true,
         args : [
             '--remote-debugging-port=9090'
         ]
@@ -91,7 +95,7 @@ exports.createBrowserSync = createBrowserSync;
 //createPuppeteer
 async function _connectLocalPuppeteer(){
     const debuggerUrl = await getWebSockDebuggerUrl();
-    const browser = await puppeteer.connect({browserWSEndpoint : debuggerUrl});
+    const browser = await puppeteer.connect({browserWSEndpoint : debuggerUrl,ignoreHTTPSErrors:true});
     return browser;
 }
 const connectLocalPuppeteer = _connectLocalPuppeteer;
@@ -146,6 +150,12 @@ exports.getWebSockDebuggerUrl = getWebSockDebuggerUrl;
 gulp.task("live-edit",async ()=>{
     await createBrowserSync();
     await connectLocalPuppeteer();
+
+    const _browserSyncUrl = "https://localhost:3000";
+    let browserSyncUrl = _browserSyncUrl;
+    const iphone = await createPage(browserSyncUrl,"iPhone 8");
+//     await createPage(browserSyncUrl,"iPad");
+//     await createPage(browserSyncUrl);
 })
 
 gulp.task("default",gulp.series("puppeteer","live-edit","sass","js_src","serve"))

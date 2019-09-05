@@ -42,7 +42,7 @@ test('Tests creation of Page takes url and device type returns the Page', async 
     expect(page).toBeDefined();
     await page.close();
 
-    const devicePage = await createPage("https://google.com","iPhone 8")
+    const devicePage = await createPage("https://thedevelopertt.ml","iPhone 8")
     expect(devicePage).toBeDefined();
     await devicePage.close();
 

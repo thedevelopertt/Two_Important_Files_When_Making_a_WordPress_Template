@@ -10,6 +10,7 @@ const plumber = require("gulp-plumber")
 const browsersync = require("browser-sync").create()
 const puppeteer = require("puppeteer")
 const phpunit = require("gulp-phpunit")
+const axios = require("axios")
 
 
 // This task compiles SASS to css with autoprefixer enabled, generates sourcemaps and minifies to the dist/css directory
@@ -56,25 +57,61 @@ gulp.task('phpunit', async function() {
         }));
 });
 
-//Launches new Puppeteer Browser
+// //Launches new Puppeteer Browser
 gulp.task('puppeteer', async () => {
-    // await puppeteer.launch({
-    //     headless : false
-    // })
+    await initializePuppeteer();
 })
 
+//initializePuppeteer
+async function _initializePuppeteer(){
+    const _puppeteer = await puppeteer.launch({
+        headless : false,
+        args : [
+            '--remote-debugging-port=9090'
+        ]
+    })
+    return _puppeteer;
+
+}
+const initializePuppeteer = _initializePuppeteer;
+exports.initializePuppeteer = initializePuppeteer;
+//initializePuppeteer
+
 //createBrowserSync
-function _createBrowserSync(){
-    browsersync.init({
-        proxy : "https://thedevelopertt.ml"
+async function _createBrowserSync(){
+    await browsersync.init({
+        proxy : "https://thedevelopertt.ml",
+        open: false
     });
 }
 const createBrowserSync = _createBrowserSync;
 exports.createBrowserSync = createBrowserSync;
 //createBrowserSync
 
-gulp.task("live-edit",()=>{
-    createBrowserSync();
+//createPuppeteer
+async function _createPuppeteer(){
+
+    const debuggerUrl = await getWebSockDebuggerUrl();
+    const browser = await puppeteer.connect({browserWSEndpoint : debuggerUrl});
+}
+const createPuppeteer = _createPuppeteer;
+exports.createPuppeteer = createPuppeteer;
+//createPuppeteer
+
+
+//getWebSockDebuggerUrl
+async function _getWebSockDebuggerUrl(){
+    const response = await axios.get('http://localhost:9090/json/version')
+    const {webSocketDebuggerUrl} = response.data;
+    return webSocketDebuggerUrl;
+}
+const getWebSockDebuggerUrl = _getWebSockDebuggerUrl;
+exports.getWebSockDebuggerUrl = getWebSockDebuggerUrl;
+//getWebSockDebuggerUrl
+
+gulp.task("live-edit",async ()=>{
+    await createBrowserSync();
+    await createPuppeteer();
 })
 
-gulp.task("default",gulp.parallel("live-edit","sass","js_src","serve","puppeteer"))
+gulp.task("default",gulp.series("puppeteer","live-edit","sass","js_src","serve"))

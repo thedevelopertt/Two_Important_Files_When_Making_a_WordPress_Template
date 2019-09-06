@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App;
 class SampleUserForTest{
     function hello(){

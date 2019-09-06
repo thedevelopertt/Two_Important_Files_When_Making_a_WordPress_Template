@@ -18,7 +18,6 @@ const {Page,Browser} = puppeteer;
 // This task compiles SASS to css with autoprefixer enabled, generates sourcemaps and minifies to the dist/css directory
 gulp.task("sass",()=>{
     return gulp.src("src/sass/*.scss")
-        .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(sass())
         .pipe(sourcemaps.write({includeContent:false}))
@@ -43,8 +42,8 @@ gulp.task('js_src', () => {
 //This task is called with the gulp keyword
 gulp.task('serve',()=>{
 
-    gulp.watch("src/sass/*.scss",gulp.parallel("sass"))
-    gulp.watch("src/js/*.js",gulp.parallel("js_src"))
+    gulp.watch("src/sass/*.scss",gulp.series("sass"))
+    gulp.watch("src/js/*.js",gulp.series("js_src"))
 
     gulp.watch("./*.php").on('change', browsersync.reload);
     gulp.watch("./src/*.php").on('change', browsersync.reload);
@@ -70,6 +69,7 @@ async function _initializePuppeteer(){
         headless : false,
         slowMo : 200,
         ignoreHTTPSErrors: true,
+        // devtools: true,
         args : [
             '--remote-debugging-port=9090'
         ]
